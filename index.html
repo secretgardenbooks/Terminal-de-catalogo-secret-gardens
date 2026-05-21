@@ -14,11 +14,11 @@
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { background: var(--navy); color: var(--text); font-family: 'Jost', sans-serif; min-height: 100vh; padding: 20px; }
   
-  /* ── Login ── */
+  /* ── Control de Login ── */
   .login-container { max-width: 360px; margin: 100px auto; background: var(--deep); padding: 30px; border-radius: 12px; border: 1px solid var(--purple); text-align: center; box-shadow: 0 0 30px rgba(123,94,167,0.3); }
   .login-container h2 { font-family: 'Cormorant Garamond', serif; font-size: 2rem; margin-bottom: 20px; color: var(--gold); }
   
-  /* ── Componentes Globales ── */
+  /* ── Componentes de Formulario Globales ── */
   input, textarea, select { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(169,143,208,0.3); padding: 12px; border-radius: 8px; color: white; margin-bottom: 15px; font-family: inherit; outline: none; display: block; -webkit-appearance: none; -moz-appearance: none; appearance: none; }
   select { background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' fill='%23a98fd0'><polygon points='0,0 10,0 5,7'/></svg>"); background-repeat: no-repeat; background-position: right 15px center; padding-right: 30px; }
   input:focus, textarea:focus, select:focus { border-color: var(--purple); background: rgba(255,255,255,0.08); }
@@ -26,17 +26,17 @@
   button { background: var(--purple); color: white; border: none; padding: 12px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; text-transform: uppercase; width: 100%; transition: 0.3s; }
   button:hover { background: #8c6fc2; }
   
-  /* ── Panel Principal ── */
+  /* ── Caja del Panel Principal ── */
   .admin-box { max-width: 700px; margin: 0 auto; background: var(--deep); padding: 30px; border-radius: 15px; border: 1px solid rgba(169,143,208,0.2); display: none; margin-bottom: 50px; }
   .admin-header { text-align: center; margin-bottom: 25px; border-bottom: 1px solid rgba(169,143,208,0.1); padding-bottom: 15px; }
   .admin-header h1 { font-family: 'Cormorant Garamond', serif; color: var(--gold); font-size: 2.2rem; }
   
-  /* ── Buscador Rápido ── */
+  /* ── Buscador Interno por ID ── */
   .search-section { background: rgba(255,255,255,0.02); padding: 15px; border-radius: 8px; border: 1px dashed var(--purple); margin-bottom: 25px; display: flex; gap: 10px; align-items: flex-end; }
   .search-section .input-container { flex: 1; }
   .search-section button { width: auto; white-space: nowrap; height: 46px; margin-bottom: 15px; }
   
-  /* ── Diseño de Formulario Inteligente ── */
+  /* ── Grilla Responsiva Estricta ── */
   .row-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
   .form-group { display: flex; flex-direction: column; }
   label { font-size: 0.85rem; color: var(--lavender); margin-bottom: 6px; display: block; text-transform: uppercase; letter-spacing: 1px; }
@@ -44,7 +44,7 @@
   .success { background: rgba(37, 211, 102, 0.15); color: #25D366; border: 1px solid #25D366; }
   .error { background: rgba(255, 75, 75, 0.15); color: #ff4b4b; border: 1px solid #ff4b4b; }
 
-  /* Corrección Responsive para Celulares */
+  /* Ajustes Móviles: Evita desalineaciones en pantallas pequeñas */
   @media(max-width: 580px) {
     .row-grid { grid-template-columns: 1fr; gap: 0; }
     .search-section { flex-direction: column; gap: 0; align-items: stretch; }
@@ -137,10 +137,11 @@
 </div>
 
 <script>
-const URL_CSV = "https://docs.google.com/spreadsheets/d/1XyYs7UJAhu8nKhhlHWCrxFbP4TU5GaXKA2K5fQhneVU/export?format=csv&gid=0";
+// Vinculado nativamente a tu nuevo archivo Sheets de libros
+const URL_CSV = "https://docs.google.com/spreadsheets/d/1LyKI6OiOagXXQDel0a5NKojaggCccEEMQF43L2fgTuw/export?format=csv&gid=0";
 
-// URL DE EJECUCIÓN ACTUALIZADA CON ÉXITO
-const URL_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbyV_StRvBigA8oSkgIP-FQ3qlZtLtknRA8Q0XAbEh7-6J43-OQ1rATj0O_EBNMU0UCF/exec";
+// TODO: REEMPLAZA ESTA URL CON TU NUEVA URL DE APPS SCRIPT QUE GENERASTE EN EL PASO ANTERIOR
+const URL_APPS_SCRIPT = "AQUÍ_PEGA_TU_NUEVA_URL_DE_APPS_SCRIPT";
 
 let sessionUser = "";
 let sessionPass = "";
@@ -185,7 +186,7 @@ async function buscarLibro() {
           document.getElementById('bookDesc').value = libro[5] || "";
           document.getElementById('bookImg').value = libro[6] || "";
           
-          // Lógica estricta de Stock para Si/No
+          // Tratamiento adaptativo estricto para respuestas Si / No
           let stockVal = libro[7] ? libro[7].trim().toLowerCase() : "si";
           if(stockVal === "no" || stockVal === "0" || stockVal === "agotado") {
             document.getElementById('bookStock').value = "No";
@@ -224,7 +225,7 @@ async function guardarDatos(event) {
     precio: parseFloat(document.getElementById('bookPrice').value) || 0,
     descripcion: document.getElementById('bookDesc').value.trim(),
     imagen: document.getElementById('bookImg').value.trim(),
-    stock: document.getElementById('bookStock').value, // Sube "Si" o "No" nativo
+    stock: document.getElementById('bookStock').value, // Sube "Si" o "No" puro
     tapa: document.getElementById('bookCover').value
   };
 
@@ -236,7 +237,7 @@ async function guardarDatos(event) {
       body: JSON.stringify(payload)
     });
 
-    showStatus("¡Guardado exitoso! Los datos se actualizaron en tu Google Sheets correctamente. El catálogo público reflejará el cambio inmediatamente.", "success");
+    showStatus("¡Guardado exitoso! Los datos se actualizaron en tu Google Sheets correctamente. Tu catálogo reflejará los cambios de inmediato.", "success");
     document.getElementById('bookForm').reset();
     document.getElementById('searchId').value = "";
   } catch (error) {

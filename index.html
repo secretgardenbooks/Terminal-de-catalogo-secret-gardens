@@ -183,9 +183,9 @@ async function buscarLibro() {
           document.getElementById('bookDesc').value = libro[5] || "";
           document.getElementById('bookImg').value = libro[6] || "";
           
-          // Tratamiento para el Stock en formato Si/No
-          let stockVal = libro[7] ? libro[7].trim() : "Si";
-          if(stockVal.toLowerCase() === "no" || stockVal === "0") {
+          // Lógica estricta de lectura de Stock en formato Si/No
+          let stockVal = libro[7] ? libro[7].trim().toLowerCase() : "si";
+          if(stockVal === "no" || stockVal === "0" || stockVal === "agotado") {
             document.getElementById('bookStock').value = "No";
           } else {
             document.getElementById('bookStock').value = "Si";
@@ -197,6 +197,7 @@ async function buscarLibro() {
         } else {
           showStatus("El ID no existe en tu Excel. Si guardas, se creará como un libro nuevo.", "error");
           document.getElementById('bookId').value = idBuscado;
+          document.getElementById('bookStock').value = "Si";
         }
       }
     });
@@ -221,7 +222,7 @@ async function guardarDatos(event) {
     precio: parseFloat(document.getElementById('bookPrice').value) || 0,
     descripcion: document.getElementById('bookDesc').value.trim(),
     imagen: document.getElementById('bookImg').value.trim(),
-    stock: document.getElementById('bookStock').value,
+    stock: document.getElementById('bookStock').value, // Envía "Si" o "No" directamente
     tapa: document.getElementById('bookCover').value
   };
 

@@ -44,7 +44,7 @@
   .success { background: rgba(37, 211, 102, 0.15); color: #25D366; border: 1px solid #25D366; }
   .error { background: rgba(255, 75, 75, 0.15); color: #ff4b4b; border: 1px solid #ff4b4b; }
 
-  /* Corrección Móvil: Alinea y apila las cajas correctamente */
+  /* Corrección Responsive para Celulares */
   @media(max-width: 580px) {
     .row-grid { grid-template-columns: 1fr; gap: 0; }
     .search-section { flex-direction: column; gap: 0; align-items: stretch; }
@@ -139,8 +139,8 @@
 <script>
 const URL_CSV = "https://docs.google.com/spreadsheets/d/1XyYs7UJAhu8nKhhlHWCrxFbP4TU5GaXKA2K5fQhneVU/export?format=csv&gid=0";
 
-// ENLACE NUEVO ASIGNADO Y ENLAZADO DIRECTAMENTE
-const URL_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbveMmeHeD2v0-7jH-fsYW5fCt23ZxWuKfsFIAd9No4WiFu10LoY_ul75CbZI5aV0/exec";
+// URL DE EJECUCIÓN ACTUALIZADA CON ÉXITO
+const URL_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbzxS6GoaKUji658b-B3pAJ21TsaDEKCkieW3f3krFWhV-NxBZ4IgJgi58l7BLSWWRAQ/exec";
 
 let sessionUser = "";
 let sessionPass = "";
@@ -149,7 +149,6 @@ function login() {
   const u = document.getElementById('userInput').value;
   const p = document.getElementById('passInput').value;
   
-  // Sincronizado exactamente con tus nuevas credenciales
   if(u.trim() === "BIbi" && p.trim() === "Bibi301103") {
     sessionUser = u;
     sessionPass = p;
@@ -186,7 +185,7 @@ async function buscarLibro() {
           document.getElementById('bookDesc').value = libro[5] || "";
           document.getElementById('bookImg').value = libro[6] || "";
           
-          // Sincronización inteligente de Stock (Maneja "Si" o "No" nativos de la celda)
+          // Lógica estricta de Stock para Si/No
           let stockVal = libro[7] ? libro[7].trim().toLowerCase() : "si";
           if(stockVal === "no" || stockVal === "0" || stockVal === "agotado") {
             document.getElementById('bookStock').value = "No";
@@ -225,7 +224,7 @@ async function guardarDatos(event) {
     precio: parseFloat(document.getElementById('bookPrice').value) || 0,
     descripcion: document.getElementById('bookDesc').value.trim(),
     imagen: document.getElementById('bookImg').value.trim(),
-    stock: document.getElementById('bookStock').value, // Sube "Si" o "No" como cadena de texto limpia
+    stock: document.getElementById('bookStock').value, // Sube "Si" o "No" nativo
     tapa: document.getElementById('bookCover').value
   };
 

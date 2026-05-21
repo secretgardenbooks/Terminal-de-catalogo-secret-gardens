@@ -137,11 +137,11 @@
 </div>
 
 <script>
-// Vinculado nativamente a tu nuevo archivo Sheets de libros
+// Vinculado al nuevo archivo Sheets de libros
 const URL_CSV = "https://docs.google.com/spreadsheets/d/1LyKI6OiOagXXQDel0a5NKojaggCccEEMQF43L2fgTuw/export?format=csv&gid=0";
 
-// TODO: REEMPLAZA ESTA URL CON TU NUEVA URL DE APPS SCRIPT QUE GENERASTE EN EL PASO ANTERIOR
-const URL_APPS_SCRIPT = "AQUÍ_PEGA_TU_NUEVA_URL_DE_APPS_SCRIPT";
+// ENLACE DE EJECUCIÓN VINCULADO CORRECTAMENTE
+const URL_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbyV_StRvBigA8oSkgIP-FQ3qlZtLtknRA8Q0XAbEh7-6J43-OQ1rATj0O_EBNMU0UCF/exec";
 
 let sessionUser = "";
 let sessionPass = "";
@@ -150,7 +150,8 @@ function login() {
   const u = document.getElementById('userInput').value;
   const p = document.getElementById('passInput').value;
   
-  if(u.trim() === "BIbi" && p.trim() === "Bibi301103") {
+  // Sincronizado en minúsculas estrictas: bibi / bibi3011
+  if(u.trim() === "bibi" && p.trim() === "bibi3011") {
     sessionUser = u;
     sessionPass = p;
     document.getElementById('loginSection').style.display = 'none';

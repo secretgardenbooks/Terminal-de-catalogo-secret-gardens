@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Terminal de Administración — SGB</title>
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<style>
+  :root {
+    --navy: #0d1b3e; --deep: #111c3a; --purple: #7b5ea7;
+    --lavender: #a98fd0; --gold: #d4b896; --text: #e2ddf0;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--navy); color: var(--text); font-family: 'Jost', sans-serif; min-height: 100vh; padding: 20px; }
+  
+  /* ── Login ── */
+  .login-container { max-width: 360px; margin: 100px auto; background: var(--deep); padding: 30px; border-radius: 12px; border: 1px solid var(--purple); text-align: center; box-shadow: 0 0 30px rgba(123,94,167,0.3); }
+  .login-container h2 { font-family: 'Cormorant Garamond', serif; font-size: 2rem; margin-bottom: 20px; color: var(--gold); }
+  
+  /* ── Componentes Globales ── */
+  input, textarea, select { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(169,143,208,0.3); padding: 12px; border-radius: 8px; color: white; margin-bottom: 15px; font-family: inherit; outline: none; }
+  input:focus, textarea:focus { border-color: var(--purple); }
+  button { background: var(--purple); color: white; border: none; padding: 12px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; text-transform: uppercase; width: 100%; transition: 0.3s; }
+  button:hover { background: #8c6fc2; }
+  
+  /* ── Panel Principal ── */
+  .admin-box { max-width: 700px; margin: 0 auto; background: var(--deep); padding: 30px; border-radius: 15px; border: 1px solid rgba(169,143,208,0.2); display: none; }
+  .admin-box { margin-bottom: 50px; }
+  .admin-header { text-align: center; margin-bottom: 25px; border-bottom: 1px solid rgba(169,143,208,0.1); padding-bottom: 15px; }
+  .admin-header h1 { font-family: 'Cormorant Garamond', serif; color: var(--gold); font-size: 2.2rem; }
+  
+  /* ── Buscador Rápido ── */
+  .search-section { background: rgba(255,255,255,0.02); padding: 15px; border-radius: 8px; border: 1px dashed var(--purple); margin-bottom: 25px; display: flex; gap: 10px; align-items: flex-start; }
+  .search-section button { width: auto; white-space: nowrap; height: 46px; }
+  
+  /* ── Diseño de Formulario ── */
+  .row-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+  label { font-size: 0.85rem; color: var(--lavender); margin-bottom: 5px; display: block; text-transform: uppercase; letter-spacing: 1px; }
+  .status-msg { text-align: center; padding: 12px; margin-top: 15px; border-radius: 6px; font-weight: 500; display: none; line-height: 1.4; }
+  .success { background: rgba(37, 211, 102, 0.15); color: #25D366; border: 1px solid #25D366; }
+  .error { background: rgba(255, 75, 75, 0.15); color: #ff4b4b; border: 1px solid #ff4b4b; }
+
+  /* Soporte Móvil */
+  @media(max-width: 550px) {
+    .row-grid { grid-template-columns: 1fr; gap: 0; }
+  }
+</style>
+</head>
+<body>
+
+<div id="loginSection" class="login-container">
+  <h2>Control de Acceso</h2>
+  <input type="text" id="userInput" placeholder="Usuario administrador">
+  <input type="password" id="passInput" placeholder="Contraseña">
+  <button onclick="login()">Ingresar al Jardín</button>
+  <p id="loginError" style="color:#ff4b4b; font-size:0.85rem; margin-top:10px; display:none;">Credenciales incorrectas</p>
+</div>
+
+<div id="adminPanel" class="admin-box">
+  <div class="admin-header">
+    <h1>Terminal de Gestión</h1>
+    <p style="font-size:0.85rem; color:var(--lavender);">The Secret Gardens Books</p>
+  </div>
+  
+  <div class="search-section">
+    <div style="flex:1;">
+      <label>Buscar Libro Existente (Por ID)</label>
+      <input type="text" id="searchId" placeholder="Escribe el ID numérico del libro...">
+    </div>
+    <button style="margin-top: 22px;" onclick="buscarLibro()">Buscar 🔍</button>
+  </div>
+
+  <form id="bookForm" onsubmit="guardarDatos(event)">
+    <div class="row-grid">
+      <div>
+        <label>ID del Libro (Numérico)</label>
+        <input type="number" id="bookId" required placeholder="Ej: 1">
+      </div>
+      <div>
+        <label>Precio de Venta ($)</label>
+        <input type="number" step="0.01" id="bookPrice" required placeholder="0.00">
+      </div>
+    </div>
+
+    <div class="row-grid">
+      <div>
+        <label>Título del Libro</label>
+        <input type="text" id="bookTitle" required placeholder="Nombre del libro">
+      </div>
+      <div>
+        <label>Autor</label>
+        <input type="text" id="bookAuthor" required placeholder="Nombre del autor">
+      </div>
+    </div>
+
+    <div class="row-grid">
+      <div>
+        <label>Género Literario</label>
+        <input type="text" id="bookGenre" required placeholder="Ej: Romance, Fantasía">
+      </div>
+      <div>
+        <label>Tipo de Tapa</label>
+        <select id="bookCover">
+          <option value="Tapa Blanda">Tapa Blanda</option>
+          <option value="Tapa Dura">Tapa Dura</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="row-grid">
+      <div>
+        <label>Link de Imagen (Google Drive)</label>
+        <input type="text" id="bookImg" required placeholder="Enlace de compartir de Drive">
+      </div>
+      <div>
+        <label>Unidades en Stock</label>
+        <input type="number" id="bookStock" required value="10">
+      </div>
+    </div>
+
+    <label>Sinopsis / Descripción</label>
+    <textarea id="bookDesc" rows="6" required placeholder="Escribe aquí la sinopsis completa..."></textarea>
+
+    <button type="submit" id="submitBtn">Guardar Libro en Excel 🌙</button>
+  </form>
+
+  <div id="statusMsg" class="status-msg"></div>
+</div>
+
+<script>
+const URL_CSV = "https://docs.google.com/spreadsheets/d/1XyYs7UJAhu8nKhhlHWCrxFbP4TU5GaXKA2K5fQhneVU/export?format=csv&gid=0";
+
+// ENLACE REAL DE TU APLICACIÓN WEB DE GOOGLE ASIGNADO AUTOMÁTICAMENTE
+const URL_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbwa_UBXJABR3lJ-3NYEspGRvlu8PWzQfahqBHtlpwSAIyo8nDzwKxTl-HO1VvgR8O3i/exec";
+
+let sessionUser = "";
+let sessionPass = "";
+
+// 1. Manejo de Login Local
+function login() {
+  const u = document.getElementById('userInput').value;
+  const p = document.getElementById('passInput').value;
+  
+  if(u.trim() === "admin" && p.trim() === "SecretGardens2026") {
+    sessionUser = u;
+    sessionPass = p;
+    document.getElementById('loginSection').style.display = 'none';
+    document.getElementById('adminPanel').style.display = 'block';
+  } else {
+    document.getElementById('loginError').style.display = 'block';
+  }
+}
+
+// 2. Lógica del Buscador de Libros por ID
+async function buscarLibro() {
+  const idBuscado = document.getElementById('searchId').value.trim();
+  if(!idBuscado) return alert("Por favor escribe un ID para buscar.");
+  
+  showStatus("Consultando base de datos...", "success");
+  
+  try {
+    const response = await fetch(URL_CSV);
+    const textData = await response.text();
+    
+    Papa.parse(textData, {
+      header: false,
+      skipEmptyLines: true,
+      complete: function(results) {
+        const rows = results.data.slice(1);
+        const libro = rows.find(r => String(r[0]).trim() === idBuscado);
+        
+        if(libro) {
+          document.getElementById('bookId').value = libro[0] || "";
+          document.getElementById('bookTitle').value = libro[1] || "";
+          document.getElementById('bookAuthor').value = libro[2] || "";
+          document.getElementById('bookGenre').value = libro[3] || "";
+          document.getElementById('bookPrice').value = libro[4] ? libro[4].replace(/[^0-9.-]+/g,"") : "0";
+          document.getElementById('bookDesc').value = libro[5] || "";
+          document.getElementById('bookImg').value = libro[6] || "";
+          document.getElementById('bookStock').value = libro[7] || "10";
+          document.getElementById('bookCover').value = libro[8] || "Tapa Blanda";
+          
+          showStatus("¡Libro cargado! Modifica los campos que necesites y guarda.", "success");
+        } else {
+          showStatus("El ID no existe en tu Excel. Si guardas, se creará como un libro nuevo.", "error");
+          document.getElementById('bookId').value = idBuscado;
+        }
+      }
+    });
+  } catch (error) {
+    showStatus("Error al buscar: " + error.message, "error");
+  }
+}
+
+// 3. Envío seguro de datos mediante JSON encapsulado
+async function guardarDatos(event) {
+  event.preventDefault();
+  const btn = document.getElementById('submitBtn');
+  btn.innerText = "Sincronizando con Excel... ⌛";
+  btn.disabled = true;
+
+  const payload = {
+    user: sessionUser,
+    pass: sessionPass,
+    id: document.getElementById('bookId').value.trim(),
+    titulo: document.getElementById('bookTitle').value.trim(),
+    autor: document.getElementById('bookAuthor').value.trim(),
+    genero: document.getElementById('bookGenre').value.trim(),
+    precio: parseFloat(document.getElementById('bookPrice').value) || 0,
+    descripcion: document.getElementById('bookDesc').value.trim(),
+    imagen: document.getElementById('bookImg').value.trim(),
+    stock: parseInt(document.getElementById('bookStock').value) || 0,
+    tapa: document.getElementById('bookCover').value
+  };
+
+  try {
+    await fetch(URL_APPS_SCRIPT, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+
+    showStatus("¡Guardado exitoso! Los datos se actualizaron en tu Google Sheets correctamente. El catálogo público se actualizará de inmediato.", "success");
+    document.getElementById('bookForm').reset();
+    document.getElementById('searchId').value = "";
+  } catch (error) {
+    showStatus("Error al sincronizar datos: " + error.message, "error");
+  } finally {
+    btn.innerText = "Guardar Libro en Excel 🌙";
+    btn.disabled = false;
+  }
+}
+
+function showStatus(text, type) {
+  const el = document.getElementById('statusMsg');
+  el.innerText = text;
+  el.className = "status-msg " + type;
+  el.style.display = "block";
+}
+</script>
+</body>
+</html>

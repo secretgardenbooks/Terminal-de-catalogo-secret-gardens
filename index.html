@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Terminal de Administración — SGB</title>
-<link href="[https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600&family=Cormorant+Garamond:wght@400;600&display=swap](https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600&family=Cormorant+Garamond:wght@400;600&display=swap)" rel="stylesheet">
-<script src="[https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js](https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js)"></script>
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 <style>
   :root {
     --navy: #0d1b3e; --deep: #111c3a; --purple: #7b5ea7;
@@ -18,12 +18,13 @@
   .login-container h2 { font-family: 'Cormorant Garamond', serif; font-size: 2rem; margin-bottom: 20px; color: var(--gold); }
   
   input, textarea, select { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(169,143,208,0.3); padding: 12px; border-radius: 8px; color: white; margin-bottom: 15px; font-family: inherit; outline: none; display: block; -webkit-appearance: none; appearance: none; }
-  select { background-image: url("data:image/svg+xml;utf8,<svg xmlns='[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)' width='10' height='10' fill='%23a98fd0'><polygon points='0,0 10,0 5,7'/></svg>"); background-repeat: no-repeat; background-position: right 15px center; padding-right: 30px; }
+  select { background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' fill='%23a98fd0'><polygon points='0,0 10,0 5,7'/></svg>"); background-repeat: no-repeat; background-position: right 15px center; padding-right: 30px; }
   input:focus, textarea:focus, select:focus { border-color: var(--purple); background: rgba(255,255,255,0.08); }
   select option { background: var(--deep); color: var(--text); }
   
   button { background: var(--purple); color: white; border: none; padding: 12px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; text-transform: uppercase; width: 100%; transition: 0.3s; }
   button:hover { background: #8c6fc2; }
+  button:disabled { background: #4a3b63 !important; color: #888 !important; cursor: not-allowed; }
   
   .admin-box { max-width: 700px; margin: 0 auto; background: var(--deep); padding: 30px; border-radius: 15px; border: 1px solid rgba(169,143,208,0.2); display: none; margin-bottom: 50px; }
   .admin-header { text-align: center; margin-bottom: 25px; border-bottom: 1px solid rgba(169,143,208,0.1); padding-bottom: 15px; }
@@ -140,8 +141,10 @@
 </div>
 
 <script>
-const URL_CSV = "[https://docs.google.com/spreadsheets/d/1LyKI6OiOagXXQDel0a5NKojaggCccEEMQF43L2fgTuw/export?format=csv&gid=0](https://docs.google.com/spreadsheets/d/1LyKI6OiOagXXQDel0a5NKojaggCccEEMQF43L2fgTuw/export?format=csv&gid=0)";
-const URL_APPS_SCRIPT = "[https://script.google.com/macros/s/AKfycbyV_StRvBigA8oSkgIP-FQ3qlZtLtknRA8Q0XAbEh7-6J43-OQ1rATj0O_EBNMU0UCF/exec](https://script.google.com/macros/s/AKfycbyV_StRvBigA8oSkgIP-FQ3qlZtLtknRA8Q0XAbEh7-6J43-OQ1rATj0O_EBNMU0UCF/exec)";
+const URL_CSV = "https://docs.google.com/spreadsheets/d/1LyKI6OiOagXXQDel0a5NKojaggCccEEMQF43L2fgTuw/export?format=csv&gid=0";
+
+// TU NUEVA DIRECCIÓN DE SERVIDOR DETECTADA Y ACTUALIZADA AQUÍ
+const URL_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbwHCwwlL0BU9FYKz2EMa4gjFeYzoG-qJLBY5OX0C0JIkR0qDV-xr42KFkf2gLfyuqd_/exec";
 
 let sessionUser = "";
 let sessionPass = "";
@@ -164,8 +167,9 @@ async function procesarConIA() {
   if (!texto) return alert("Por favor, introduce algún texto para procesar.");
   
   const btn = document.getElementById('btnIA');
-  btn.innerText = "Pensando e identificando datos... 🔮";
+  btn.innerText = "Sincronizando con Gemini AI... ⌛🔮";
   btn.disabled = true;
+  showStatus("La Inteligencia Artificial está analizando tu texto y calculando el ID. Por favor espera...", "success");
   
   try {
     const response = await fetch(URL_APPS_SCRIPT, {
@@ -191,13 +195,13 @@ async function procesarConIA() {
       document.getElementById('bookCover').value = libro.tapa || "Tapa Blanda";
       document.getElementById('bookStock').value = "Si";
       
-      showStatus("¡Campos rellenados con éxito! Por favor añade el link de la imagen y haz clic en Guardar.", "success");
+      showStatus("¡Campos completados con éxito! Solo añade el link de imagen y guarda.", "success");
       document.getElementById('rawIAText').value = "";
     } else {
-      alert("Error de la IA: " + resData.message);
+      showStatus("Error interno de la IA: " + resData.message, "error");
     }
   } catch (error) {
-    showStatus("Error al conectar con el asistente de IA. Revisa la implementación pública.", "error");
+    showStatus("Error de conexión: " + error.message + ". Asegúrate de publicar el Apps Script como 'Nueva versión' y acceso para 'Cualquiera'.", "error");
   } finally {
     btn.innerText = "Procesar Texto con IA 🔮";
     btn.disabled = false;

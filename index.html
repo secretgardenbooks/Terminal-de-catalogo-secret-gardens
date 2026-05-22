@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Terminal de Administración — SGB</title>
-<link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<link href="[https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600&family=Cormorant+Garamond:wght@400;600&display=swap](https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600&family=Cormorant+Garamond:wght@400;600&display=swap)" rel="stylesheet">
+<script src="[https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js](https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js)"></script>
 <style>
   :root {
     --navy: #0d1b3e; --deep: #111c3a; --purple: #7b5ea7;
@@ -14,37 +14,33 @@
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { background: var(--navy); color: var(--text); font-family: 'Jost', sans-serif; min-height: 100vh; padding: 20px; }
   
-  /* ── Control de Login ── */
   .login-container { max-width: 360px; margin: 100px auto; background: var(--deep); padding: 30px; border-radius: 12px; border: 1px solid var(--purple); text-align: center; box-shadow: 0 0 30px rgba(123,94,167,0.3); }
   .login-container h2 { font-family: 'Cormorant Garamond', serif; font-size: 2rem; margin-bottom: 20px; color: var(--gold); }
   
-  /* ── Componentes de Formulario Globales ── */
-  input, textarea, select { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(169,143,208,0.3); padding: 12px; border-radius: 8px; color: white; margin-bottom: 15px; font-family: inherit; outline: none; display: block; -webkit-appearance: none; -moz-appearance: none; appearance: none; }
-  select { background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' fill='%23a98fd0'><polygon points='0,0 10,0 5,7'/></svg>"); background-repeat: no-repeat; background-position: right 15px center; padding-right: 30px; }
+  input, textarea, select { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(169,143,208,0.3); padding: 12px; border-radius: 8px; color: white; margin-bottom: 15px; font-family: inherit; outline: none; display: block; -webkit-appearance: none; appearance: none; }
+  select { background-image: url("data:image/svg+xml;utf8,<svg xmlns='[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)' width='10' height='10' fill='%23a98fd0'><polygon points='0,0 10,0 5,7'/></svg>"); background-repeat: no-repeat; background-position: right 15px center; padding-right: 30px; }
   input:focus, textarea:focus, select:focus { border-color: var(--purple); background: rgba(255,255,255,0.08); }
   select option { background: var(--deep); color: var(--text); }
+  
   button { background: var(--purple); color: white; border: none; padding: 12px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; text-transform: uppercase; width: 100%; transition: 0.3s; }
   button:hover { background: #8c6fc2; }
   
-  /* ── Caja del Panel Principal ── */
   .admin-box { max-width: 700px; margin: 0 auto; background: var(--deep); padding: 30px; border-radius: 15px; border: 1px solid rgba(169,143,208,0.2); display: none; margin-bottom: 50px; }
   .admin-header { text-align: center; margin-bottom: 25px; border-bottom: 1px solid rgba(169,143,208,0.1); padding-bottom: 15px; }
   .admin-header h1 { font-family: 'Cormorant Garamond', serif; color: var(--gold); font-size: 2.2rem; }
   
-  /* ── Buscador Interno por ID ── */
-  .search-section { background: rgba(255,255,255,0.02); padding: 15px; border-radius: 8px; border: 1px dashed var(--purple); margin-bottom: 25px; display: flex; gap: 10px; align-items: flex-end; }
+  .ia-section { background: rgba(123, 94, 167, 0.05); padding: 20px; border-radius: 10px; border: 1px dashed var(--purple); margin-bottom: 25px; }
+  .search-section { background: rgba(255,255,255,0.02); padding: 15px; border-radius: 8px; border: 1px solid rgba(169,143,208,0.15); margin-bottom: 25px; display: flex; gap: 10px; align-items: flex-end; }
   .search-section .input-container { flex: 1; }
   .search-section button { width: auto; white-space: nowrap; height: 46px; margin-bottom: 15px; }
   
-  /* ── Grilla Responsiva Estricta ── */
   .row-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
   .form-group { display: flex; flex-direction: column; }
   label { font-size: 0.85rem; color: var(--lavender); margin-bottom: 6px; display: block; text-transform: uppercase; letter-spacing: 1px; }
-  .status-msg { text-align: center; padding: 12px; margin-top: 15px; border-radius: 6px; font-weight: 500; display: none; line-height: 1.4; }
+  .status-msg { text-align: center; padding: 12px; margin-top: 15px; border-radius: 6px; font-weight: 500; display: none; }
   .success { background: rgba(37, 211, 102, 0.15); color: #25D366; border: 1px solid #25D366; }
   .error { background: rgba(255, 75, 75, 0.15); color: #ff4b4b; border: 1px solid #ff4b4b; }
 
-  /* Ajustes Móviles: Evita desalineaciones en pantallas pequeñas */
   @media(max-width: 580px) {
     .row-grid { grid-template-columns: 1fr; gap: 0; }
     .search-section { flex-direction: column; gap: 0; align-items: stretch; }
@@ -68,6 +64,13 @@
     <p style="font-size:0.85rem; color:var(--lavender);">The Secret Gardens Books</p>
   </div>
   
+  <div class="ia-section">
+    <label style="color:var(--gold); font-weight:600;">✨ Asistente de Autollenado con IA</label>
+    <p style="font-size:0.78rem; color:var(--lavender); margin-bottom:10px;">Pega aquí cualquier bloque de texto desordenado del libro y la IA rellenará el formulario entero.</p>
+    <textarea id="rawIAText" rows="4" placeholder="Ej: Consígueme el libro Alas de Sangre de Rebecca Yarros, cuesta 25$, es de género romance y fantasía, tapa dura..."></textarea>
+    <button id="btnIA" onclick="procesarConIA()" style="background:linear-gradient(45deg, var(--purple), #8c6fc2);">Procesar Texto con IA 🔮</button>
+  </div>
+
   <div class="search-section">
     <div class="input-container">
       <label>Buscar Libro Existente (Por ID)</label>
@@ -137,23 +140,18 @@
 </div>
 
 <script>
-// Vinculado al nuevo archivo Sheets de libros
-const URL_CSV = "https://docs.google.com/spreadsheets/d/1LyKI6OiOagXXQDel0a5NKojaggCccEEMQF43L2fgTuw/export?format=csv&gid=0";
-
-// ENLACE DE EJECUCIÓN VINCULADO CORRECTAMENTE
-const URL_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbyV_StRvBigA8oSkgIP-FQ3qlZtLtknRA8Q0XAbEh7-6J43-OQ1rATj0O_EBNMU0UCF/exec";
+const URL_CSV = "[https://docs.google.com/spreadsheets/d/1LyKI6OiOagXXQDel0a5NKojaggCccEEMQF43L2fgTuw/export?format=csv&gid=0](https://docs.google.com/spreadsheets/d/1LyKI6OiOagXXQDel0a5NKojaggCccEEMQF43L2fgTuw/export?format=csv&gid=0)";
+const URL_APPS_SCRIPT = "[https://script.google.com/macros/s/AKfycbyV_StRvBigA8oSkgIP-FQ3qlZtLtknRA8Q0XAbEh7-6J43-OQ1rATj0O_EBNMU0UCF/exec](https://script.google.com/macros/s/AKfycbyV_StRvBigA8oSkgIP-FQ3qlZtLtknRA8Q0XAbEh7-6J43-OQ1rATj0O_EBNMU0UCF/exec)";
 
 let sessionUser = "";
 let sessionPass = "";
 
 function login() {
-  const u = document.getElementById('userInput').value;
-  const p = document.getElementById('passInput').value;
+  const u = document.getElementById('userInput').value.trim();
+  const p = document.getElementById('passInput').value.trim();
   
-  // Sincronizado en minúsculas estrictas: bibi / bibi3011
-  if(u.trim() === "bibi" && p.trim() === "bibi3011") {
-    sessionUser = u;
-    sessionPass = p;
+  if(u === "bibi" && p === "bibi3011") {
+    sessionUser = u; sessionPass = p;
     document.getElementById('loginSection').style.display = 'none';
     document.getElementById('adminPanel').style.display = 'block';
   } else {
@@ -161,23 +159,65 @@ function login() {
   }
 }
 
+async function procesarConIA() {
+  const texto = document.getElementById('rawIAText').value.trim();
+  if (!texto) return alert("Por favor, introduce algún texto para procesar.");
+  
+  const btn = document.getElementById('btnIA');
+  btn.innerText = "Pensando e identificando datos... 🔮";
+  btn.disabled = true;
+  
+  try {
+    const response = await fetch(URL_APPS_SCRIPT, {
+      method: "POST",
+      body: JSON.stringify({
+        user: sessionUser,
+        pass: sessionPass,
+        action: "procesarIA",
+        textoBruto: texto
+      })
+    });
+    
+    const resData = await response.json();
+    
+    if (resData.status === "success") {
+      const libro = resData.data;
+      document.getElementById('bookId').value = libro.id || "";
+      document.getElementById('bookTitle').value = libro.titulo || "";
+      document.getElementById('bookAuthor').value = libro.autor || "";
+      document.getElementById('bookGenre').value = libro.genero || "";
+      document.getElementById('bookPrice').value = libro.precio || 0;
+      document.getElementById('bookDesc').value = libro.descripcion || "";
+      document.getElementById('bookCover').value = libro.tapa || "Tapa Blanda";
+      document.getElementById('bookStock').value = "Si";
+      
+      showStatus("¡Campos rellenados con éxito! Por favor añade el link de la imagen y haz clic en Guardar.", "success");
+      document.getElementById('rawIAText').value = "";
+    } else {
+      alert("Error de la IA: " + resData.message);
+    }
+  } catch (error) {
+    showStatus("Error al conectar con el asistente de IA. Revisa la implementación pública.", "error");
+  } finally {
+    btn.innerText = "Procesar Texto con IA 🔮";
+    btn.disabled = false;
+  }
+}
+
 async function buscarLibro() {
   const idBuscado = document.getElementById('searchId').value.trim();
   if(!idBuscado) return alert("Por favor escribe un ID para buscar.");
-  
   showStatus("Consultando base de datos...", "success");
   
   try {
     const response = await fetch(URL_CSV);
     const textData = await response.text();
-    
     Papa.parse(textData, {
       header: false,
       skipEmptyLines: true,
       complete: function(results) {
         const rows = results.data.slice(1);
         const libro = rows.find(r => String(r[0]).trim() === idBuscado);
-        
         if(libro) {
           document.getElementById('bookId').value = libro[0] || "";
           document.getElementById('bookTitle').value = libro[1] || "";
@@ -186,28 +226,18 @@ async function buscarLibro() {
           document.getElementById('bookPrice').value = libro[4] ? libro[4].replace(/[^0-9.-]+/g,"") : "0";
           document.getElementById('bookDesc').value = libro[5] || "";
           document.getElementById('bookImg').value = libro[6] || "";
-          
-          // Tratamiento adaptativo estricto para respuestas Si / No
           let stockVal = libro[7] ? libro[7].trim().toLowerCase() : "si";
-          if(stockVal === "no" || stockVal === "0" || stockVal === "agotado") {
-            document.getElementById('bookStock').value = "No";
-          } else {
-            document.getElementById('bookStock').value = "Si";
-          }
-          
+          document.getElementById('bookStock').value = (stockVal === "no" || stockVal === "0" || stockVal === "agotado") ? "No" : "Si";
           document.getElementById('bookCover').value = libro[8] || "Tapa Blanda";
-          
-          showStatus("¡Libro cargado! Modifica los campos que necesites y guarda.", "success");
+          showStatus("¡Libro cargado! Modifica lo que necesites y guarda.", "success");
         } else {
-          showStatus("El ID no existe en tu Excel. Si guardas, se creará como un libro nuevo.", "error");
+          showStatus("El ID no existe. Guardará como un libro nuevo.", "error");
           document.getElementById('bookId').value = idBuscado;
           document.getElementById('bookStock').value = "Si";
         }
       }
     });
-  } catch (error) {
-    showStatus("Error al buscar: " + error.message, "error");
-  }
+  } catch (error) { showStatus("Error: " + error.message, "error"); }
 }
 
 async function guardarDatos(event) {
@@ -217,8 +247,7 @@ async function guardarDatos(event) {
   btn.disabled = true;
 
   const payload = {
-    user: sessionUser,
-    pass: sessionPass,
+    user: sessionUser, pass: sessionPass,
     id: document.getElementById('bookId').value.trim(),
     titulo: document.getElementById('bookTitle').value.trim(),
     autor: document.getElementById('bookAuthor').value.trim(),
@@ -226,34 +255,22 @@ async function guardarDatos(event) {
     precio: parseFloat(document.getElementById('bookPrice').value) || 0,
     descripcion: document.getElementById('bookDesc').value.trim(),
     imagen: document.getElementById('bookImg').value.trim(),
-    stock: document.getElementById('bookStock').value, // Sube "Si" o "No" puro
+    stock: document.getElementById('bookStock').value,
     tapa: document.getElementById('bookCover').value
   };
 
   try {
-    await fetch(URL_APPS_SCRIPT, {
-      method: "POST",
-      mode: "no-cors",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
-
-    showStatus("¡Guardado exitoso! Los datos se actualizaron en tu Google Sheets correctamente. Tu catálogo reflejará los cambios de inmediato.", "success");
+    await fetch(URL_APPS_SCRIPT, { method: "POST", mode: "no-cors", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+    showStatus("¡Guardado exitoso en tu Google Sheets!", "success");
     document.getElementById('bookForm').reset();
     document.getElementById('searchId').value = "";
-  } catch (error) {
-    showStatus("Error al sincronizar datos: " + error.message, "error");
-  } finally {
-    btn.innerText = "Guardar Libro en Excel 🌙";
-    btn.disabled = false;
-  }
+  } catch (error) { showStatus("Error al guardar: " + error.message, "error"); }
+  finally { btn.innerText = "Guardar Libro en Excel 🌙"; btn.disabled = false; }
 }
 
 function showStatus(text, type) {
   const el = document.getElementById('statusMsg');
-  el.innerText = text;
-  el.className = "status-msg " + type;
-  el.style.display = "block";
+  el.innerText = text; el.className = "status-msg " + type; el.style.display = "block";
 }
 </script>
 </body>

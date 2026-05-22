@@ -20,6 +20,7 @@
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { background: var(--navy); color: var(--text); font-family: 'Jost', sans-serif; min-height: 100vh; padding: 20px; display: flex; flex-direction: column; align-items: center; position: relative; }
   .stars-background { position: fixed; inset: 0; z-index: -1; background: radial-gradient(circle at center, #111c3a 0%, #0d1b3e 100%); opacity: 0.8; }
+  
   .login-container { width: 100%; max-width: 380px; margin-top: 80px; background: var(--deep); padding: 35px 25px; border-radius: 16px; border: 1px solid rgba(123, 94, 167, 0.3); text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
   .login-container h2 { font-family: 'Cormorant Garamond', serif; font-size: 2.2rem; margin-bottom: 8px; color: var(--gold); font-weight: 600; }
   .login-container p { font-size: 0.9rem; color: var(--lavender); margin-bottom: 25px; font-style: italic; }
@@ -87,8 +88,8 @@
     <div class="ia-header-title">
       <span>✨</span> Asistente Inteligente de Autollenado (IA)
     </div>
-    <p style="font-size:0.78rem; color:var(--lavender); margin-bottom:12px; line-height:1.4;">Pega aquí los datos en bruto de un libro y la Inteligencia Artificial se encargará de rellenar de inmediato las casillas correspondientes.</p>
-    <textarea id="rawIAText" rows="4" placeholder="Ej: Consígueme el libro 'Alas de Sangre' de Rebecca Yarros, tapa dura, precio aproximado 25.40 dólares, es un romance juvenil de dragones..."></textarea>
+    <p style="font-size:0.78rem; color:var(--lavender); margin-bottom:12px; line-height:1.4;">Pega aquí los datos en bruto de un libro y la IA rellenará las casillas de forma automática.</p>
+    <textarea id="rawIAText" rows="4" placeholder="Ej: Consígueme el libro 'Alas de Sangre' de Rebecca Yarros..."></textarea>
     <button id="btnIA" onclick="procesarConIA()">Procesar Datos con IA 🔮</button>
     
     <div id="iaLoading" class="loading-container">
@@ -108,7 +109,7 @@
   <form id="bookForm" onsubmit="guardarDatos(event)">
     <div class="row-grid">
       <div class="form-group">
-        <label>ID del Libro (Ficha)</label>
+        <label>ID del Libro</label>
         <input type="number" id="bookId" required placeholder="Ej: 1">
       </div>
       <div class="form-group">

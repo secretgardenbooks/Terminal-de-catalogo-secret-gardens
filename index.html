@@ -343,14 +343,6 @@ async function guardarDatos(event) {
     btn.disabled = false; 
   }
 }
-
-function showStatus(text, type) {
-  const el = document.getElementById('statusMsg');
-  el.innerHTML = text; 
-  el.className = "status-msg " + type; 
-  el.style.display = "block";
-  el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-}
 </script>
 </body>
 </html>

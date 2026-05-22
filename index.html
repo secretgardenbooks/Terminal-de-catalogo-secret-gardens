@@ -74,6 +74,9 @@
   <p>Panel de Administración Privado</p>
   <input type="text" id="userInput" placeholder="Usuario administrador" autocomplete="username">
   <input type="password" id="passInput" placeholder="Contraseña de seguridad" autocomplete="current-password">
+  <!-- BUG #5 CORREGIDO: El login ya NO valida credenciales en el frontend.
+       Las credenciales se verifican únicamente en el servidor (Apps Script).
+       Esto evita que cualquiera vea usuario/contraseña abriendo DevTools. -->
   <button onclick="login()">Ingresar al Jardín 🔑</button>
   <p id="loginError" style="color:#ff5e5e; font-size:0.85rem; margin-top:15px; display:none; font-style: normal; font-weight: 500;">❌ Credenciales de acceso incorrectas</p>
 </div>
@@ -173,19 +176,65 @@ const URL_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbz20ESaixHyeRgR
 let sessionUser = "";
 let sessionPass = "";
 
-function login() {
+// BUG #5 CORREGIDO: El login ya no valida credenciales localmente.
+// Envía una petición de prueba al servidor y solo abre el panel
+// si el servidor responde con éxito, confirmando las credenciales.
+async function login() {
   const u = document.getElementById('userInput').value.trim();
   const p = document.getElementById('passInput').value.trim();
-  
-  if (u.toLowerCase() === "bibi" && p === "bibi3011") {
-    sessionUser = u.toLowerCase();
-    sessionPass = p;
-    document.getElementById('loginSection').style.display = 'none';
-    document.getElementById('adminPanel').style.display = 'block';
-  } else {
-    document.getElementById('loginError').style.display = 'block';
+  const errorEl = document.getElementById('loginError');
+  const btn = document.querySelector('#loginSection button');
+
+  if (!u || !p) {
+    errorEl.style.display = 'block';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = "Verificando... ⌛";
+  errorEl.style.display = 'none';
+
+  try {
+    // BUG #6 CORREGIDO: se guarda el usuario tal como viene (sin forzar toLowerCase aquí),
+    // porque el Apps Script ya compara contra "bibi" en minúsculas.
+    // Se envía exactamente lo que el usuario escribe; el servidor valida.
+    const response = await fetch(URL_APPS_SCRIPT, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({ user: u, pass: p, action: "ping" })
+    });
+
+    const resData = await response.json();
+
+    // Si el servidor responde "error" por credenciales inválidas, lo rechazamos.
+    // Si responde cualquier otra cosa (incluso error por acción desconocida),
+    // significa que pasó la validación de credenciales.
+    if (resData.message === "Credenciales inválidas") {
+      errorEl.style.display = 'block';
+    } else {
+      sessionUser = u;
+      sessionPass = p;
+      document.getElementById('loginSection').style.display = 'none';
+      document.getElementById('adminPanel').style.display = 'block';
+    }
+  } catch (err) {
+    errorEl.textContent = "❌ Error de conexión al verificar. Intenta de nuevo.";
+    errorEl.style.display = 'block';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Ingresar al Jardín 🔑";
   }
 }
+
+// Permitir login con Enter desde los campos de contraseña/usuario
+document.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('passInput').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') login();
+  });
+  document.getElementById('userInput').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') login();
+  });
+});
 
 async function procesarConIA() {
   const texto = document.getElementById('rawIAText').value.trim();
@@ -204,9 +253,7 @@ async function procesarConIA() {
   try {
     const response = await fetch(URL_APPS_SCRIPT, {
       method: "POST",
-      headers: {
-        "Content-Type": "text/plain;charset=utf-8"
-      },
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
       body: JSON.stringify({
         user: sessionUser,
         pass: sessionPass,
@@ -215,9 +262,7 @@ async function procesarConIA() {
       })
     });
     
-    if (!response.ok) {
-      throw new Error("HTTP error " + response.status);
-    }
+    if (!response.ok) throw new Error("HTTP error " + response.status);
     
     const resData = await response.json();
     
@@ -265,14 +310,22 @@ async function buscarLibro() {
       skipEmptyLines: true,
       complete: function(results) {
         const rows = results.data.slice(1);
-        const libro = rows.find(r => String(r[0]).trim() === idBuscado);
+
+        // BUG #2 (HTML) CORREGIDO: comparar ambos como número para que
+        // "5" === 5 funcione correctamente sin importar cómo lo guarda Sheets.
+        const libro = rows.find(r => Number(String(r[0]).trim()) === Number(idBuscado));
         
         if (libro) {
           document.getElementById('bookId').value = libro[0] || "";
           document.getElementById('bookTitle').value = libro[1] || "";
           document.getElementById('bookAuthor').value = libro[2] || "";
           document.getElementById('bookGenre').value = libro[3] || "";
-          document.getElementById('bookPrice').value = libro[4] ? libro[4].replace(/[^0-9.-]+/g,"") : "0";
+
+          // BUG #7 CORREGIDO: manejar precios con coma decimal (formato peruano/europeo)
+          // Primero reemplazar coma por punto, luego limpiar caracteres no numéricos.
+          const precioRaw = libro[4] ? String(libro[4]).replace(",", ".").replace(/[^0-9.]+/g, "") : "0";
+          document.getElementById('bookPrice').value = parseFloat(precioRaw) || 0;
+
           document.getElementById('bookDesc').value = libro[5] || "";
           document.getElementById('bookImg').value = libro[6] || "";
           
@@ -317,15 +370,11 @@ async function guardarDatos(event) {
   try {
     const response = await fetch(URL_APPS_SCRIPT, { 
       method: "POST", 
-      headers: {
-        "Content-Type": "text/plain;charset=utf-8"
-      },
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
       body: JSON.stringify(payload) 
     });
     
-    if (!response.ok) {
-      throw new Error("HTTP error " + response.status);
-    }
+    if (!response.ok) throw new Error("HTTP error " + response.status);
     
     const resData = await response.json();
     
@@ -342,6 +391,13 @@ async function guardarDatos(event) {
     btn.innerText = "Guardar Libro en Excel 🌙"; 
     btn.disabled = false; 
   }
+}
+
+function showStatus(msg, type) {
+  const el = document.getElementById('statusMsg');
+  el.textContent = msg;
+  el.className = "status-msg " + type;
+  el.style.display = "block";
 }
 </script>
 </body>

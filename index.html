@@ -4,86 +4,361 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Terminal de Administración — SGB</title>
-<link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 <style>
   :root {
-    --navy: #0d1b3e; --deep: #111c3a; --purple: #7b5ea7;
-    --lavender: #a98fd0; --gold: #d4b896; --text: #e2ddf0;
+    --navy: #0d1b3e;
+    --deep: #111c3a;
+    --purple: #7b5ea7;
+    --lavender: #a98fd0;
+    --gold: #d4b896;
+    --text: #e2ddf0;
+    --muted: #837a9f;
   }
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { background: var(--navy); color: var(--text); font-family: 'Jost', sans-serif; min-height: 100vh; padding: 20px; }
   
-  .login-container { max-width: 360px; margin: 100px auto; background: var(--deep); padding: 30px; border-radius: 12px; border: 1px solid var(--purple); text-align: center; box-shadow: 0 0 30px rgba(123,94,167,0.3); }
-  .login-container h2 { font-family: 'Cormorant Garamond', serif; font-size: 2rem; margin-bottom: 20px; color: var(--gold); }
+  * { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+  }
   
-  input, textarea, select { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(169,143,208,0.3); padding: 12px; border-radius: 8px; color: white; margin-bottom: 15px; font-family: inherit; outline: none; display: block; -webkit-appearance: none; appearance: none; }
-  select { background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' fill='%23a98fd0'><polygon points='0,0 10,0 5,7'/></svg>"); background-repeat: no-repeat; background-position: right 15px center; padding-right: 30px; }
-  input:focus, textarea:focus, select:focus { border-color: var(--purple); background: rgba(255,255,255,0.08); }
-  select option { background: var(--deep); color: var(--text); }
+  body { 
+    background: var(--navy); 
+    color: var(--text); 
+    font-family: 'Jost', sans-serif; 
+    min-height: 100vh; 
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+  }
   
-  button { background: var(--purple); color: white; border: none; padding: 12px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; text-transform: uppercase; width: 100%; transition: 0.3s; }
-  button:hover { background: #8c6fc2; }
-  button:disabled { background: #4a3b63 !important; color: #888 !important; cursor: not-allowed; }
+  /* ── Fondo de Estrellas Estático ── */
+  .stars-background {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background: radial-gradient(circle at center, #111c3a 0%, #0d1b3e 100%);
+    opacity: 0.8;
+  }
+
+  /* ── Caja de Control de Acceso ── */
+  .login-container { 
+    width: 100%;
+    max-width: 380px; 
+    margin-top: 80px;
+    background: var(--deep); 
+    padding: 35px 25px; 
+    border-radius: 16px; 
+    border: 1px solid rgba(123, 94, 167, 0.3); 
+    text-align: center; 
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
+  }
   
-  .admin-box { max-width: 700px; margin: 0 auto; background: var(--deep); padding: 30px; border-radius: 15px; border: 1px solid rgba(169,143,208,0.2); display: none; margin-bottom: 50px; }
-  .admin-header { text-align: center; margin-bottom: 25px; border-bottom: 1px solid rgba(169,143,208,0.1); padding-bottom: 15px; }
-  .admin-header h1 { font-family: 'Cormorant Garamond', serif; color: var(--gold); font-size: 2.2rem; }
+  .login-container h2 { 
+    font-family: 'Cormorant Garamond', serif; 
+    font-size: 2.2rem; 
+    margin-bottom: 8px; 
+    color: var(--gold); 
+    font-weight: 600;
+  }
+
+  .login-container p {
+    font-size: 0.9rem;
+    color: var(--lavender);
+    margin-bottom: 25px;
+    font-style: italic;
+  }
   
-  .ia-section { background: rgba(123, 94, 167, 0.05); padding: 20px; border-radius: 10px; border: 1px dashed var(--purple); margin-bottom: 25px; }
-  .search-section { background: rgba(255,255,255,0.02); padding: 15px; border-radius: 8px; border: 1px solid rgba(169,143,208,0.15); margin-bottom: 25px; display: flex; gap: 10px; align-items: flex-end; }
-  .search-section .input-container { flex: 1; }
-  .search-section button { width: auto; white-space: nowrap; height: 46px; margin-bottom: 15px; }
+  /* ── Inputs y Formularios Estilizados ── */
+  input, textarea, select { 
+    width: 100%; 
+    background: rgba(255,255,255,0.04); 
+    border: 1px solid rgba(169,143,208,0.25); 
+    padding: 14px; 
+    border-radius: 10px; 
+    color: white; 
+    margin-bottom: 16px; 
+    font-family: inherit; 
+    outline: none; 
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+  }
   
-  .row-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
-  .form-group { display: flex; flex-direction: column; }
-  label { font-size: 0.85rem; color: var(--lavender); margin-bottom: 6px; display: block; text-transform: uppercase; letter-spacing: 1px; }
-  .status-msg { text-align: center; padding: 12px; margin-top: 15px; border-radius: 6px; font-weight: 500; display: none; }
-  .success { background: rgba(37, 211, 102, 0.15); color: #25D366; border: 1px solid #25D366; }
-  .error { background: rgba(255, 75, 75, 0.15); color: #ff4b4b; border: 1px solid #ff4b4b; }
+  select { 
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' fill='%23a98fd0'><polygon points='0,0 10,0 5,7'/></svg>"); 
+    background-repeat: no-repeat; 
+    background-position: right 15px center; 
+    padding-right: 35px; 
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+  
+  input:focus, textarea:focus, select:focus { 
+    border-color: var(--lavender); 
+    background: rgba(255,255,255,0.08); 
+    box-shadow: 0 0 10px rgba(169, 143, 208, 0.2);
+  }
+  
+  select option { 
+    background: var(--deep); 
+    color: var(--text); 
+  }
+  
+  button { 
+    background: linear-gradient(135deg, var(--purple) 0%, #63478c 100%);
+    color: white; 
+    border: none; 
+    padding: 14px 20px; 
+    border-radius: 10px; 
+    font-weight: 600; 
+    cursor: pointer; 
+    text-transform: uppercase; 
+    width: 100%; 
+    letter-spacing: 0.5px;
+    font-size: 0.9rem;
+    transition: all 0.3s ease; 
+    box-shadow: 0 4px 15px rgba(123, 94, 167, 0.3);
+  }
+  
+  button:hover { 
+    background: linear-gradient(135deg, #8c6fc2 0%, var(--purple) 100%);
+    box-shadow: 0 6px 20px rgba(123, 94, 167, 0.5);
+  }
+  
+  button:disabled { 
+    background: #3e3352 !important; 
+    color: var(--muted) !important; 
+    cursor: not-allowed; 
+    box-shadow: none !important;
+  }
+  
+  /* ── Panel Principal de Gestión ── */
+  .admin-box { 
+    width: 100%;
+    max-width: 680px; 
+    background: var(--deep); 
+    padding: 35px 25px; 
+    border-radius: 20px; 
+    border: 1px solid rgba(169,143,208,0.15); 
+    display: none; 
+    margin-bottom: 50px; 
+    box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+  }
+  
+  .admin-header { 
+    text-align: center; 
+    margin-bottom: 30px; 
+    border-bottom: 1px solid rgba(169,143,208,0.12); 
+    padding-bottom: 20px; 
+  }
+  
+  .admin-header h1 { 
+    font-family: 'Cormorant Garamond', serif; 
+    color: var(--gold); 
+    font-size: 2.4rem; 
+    font-weight: 600;
+  }
+  
+  /* ── Asistente de IA Inteligente ── */
+  .ia-section { 
+    background: rgba(123, 94, 167, 0.08); 
+    padding: 22px; 
+    border-radius: 12px; 
+    border: 1px dashed var(--purple); 
+    margin-bottom: 30px; 
+  }
+  
+  .ia-header-title {
+    color: var(--gold); 
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1.1rem;
+    margin-bottom: 6px;
+  }
+
+  /* ── Spinner Animado de Carga ── */
+  .loading-container {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin: 15px 0;
+    padding: 12px;
+    background: rgba(13, 27, 62, 0.4);
+    border-radius: 8px;
+    border: 1px solid rgba(169, 143, 208, 0.1);
+  }
+
+  .spinner {
+    width: 24px;
+    height: 24px;
+    border: 3px solid rgba(169, 143, 208, 0.2);
+    border-top-color: var(--gold);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  .loading-text {
+    font-size: 0.9rem;
+    color: var(--lavender);
+    font-weight: 500;
+  }
+  
+  /* ── Buscador Manual de Registros ── */
+  .search-section { 
+    background: rgba(255,255,255,0.02); 
+    padding: 18px; 
+    border-radius: 12px; 
+    border: 1px solid rgba(169,143,208,0.12); 
+    margin-bottom: 30px; 
+    display: flex; 
+    gap: 12px; 
+    align-items: flex-end; 
+  }
+  
+  .search-section .input-container { 
+    flex: 1; 
+  }
+  
+  .search-section button { 
+    width: auto; 
+    white-space: nowrap; 
+    height: 49px; 
+    margin-bottom: 16px; 
+    padding: 0 25px;
+  }
+  
+  /* ── Grilla Responsiva Estricta ── */
+  .row-grid { 
+    display: grid; 
+    grid-template-columns: repeat(2, 1fr); 
+    gap: 16px; 
+  }
+  
+  .form-group { 
+    display: flex; 
+    flex-direction: column; 
+  }
+  
+  label { 
+    font-size: 0.82rem; 
+    color: var(--lavender); 
+    margin-bottom: 6px; 
+    display: block; 
+    text-transform: uppercase; 
+    letter-spacing: 1.2px; 
+    font-weight: 500;
+  }
+  
+  /* ── Mensajes de Estado ── */
+  .status-msg { 
+    text-align: center; 
+    padding: 15px; 
+    margin-top: 20px; 
+    border-radius: 10px; 
+    font-weight: 500; 
+    display: none; 
+    font-size: 0.92rem;
+    line-height: 1.5;
+  }
+  
+  .success { 
+    background: rgba(37, 211, 102, 0.12); 
+    color: #25D366; 
+    border: 1px solid rgba(37, 211, 102, 0.3); 
+  }
+  
+  .error { 
+    background: rgba(255, 75, 75, 0.12); 
+    color: #ff5e5e; 
+    border: 1px solid rgba(255, 75, 75, 0.3); 
+  }
 
   @media(max-width: 580px) {
-    .row-grid { grid-template-columns: 1fr; gap: 0; }
-    .search-section { flex-direction: column; gap: 0; align-items: stretch; }
-    .search-section button { width: 100%; margin-bottom: 0; margin-top: 5px; }
+    .row-grid { 
+      grid-template-columns: 1fr; 
+      gap: 0; 
+    }
+    .search-section { 
+      flex-direction: column; 
+      gap: 0; 
+      align-items: stretch; 
+    }
+    .search-section button { 
+      width: 100%; 
+      margin-bottom: 0; 
+      margin-top: 4px; 
+    }
+    body {
+      padding: 10px;
+    }
+    .admin-box {
+      padding: 20px 15px;
+    }
   }
 </style>
 </head>
 <body>
 
+<div class="stars-background"></div>
+
+<!-- PANTALLA DE ACCESO DE SEGURIDAD -->
 <div id="loginSection" class="login-container">
-  <h2>Control de Acceso</h2>
-  <input type="text" id="userInput" placeholder="Usuario administrador">
-  <input type="password" id="passInput" placeholder="Contraseña">
-  <button onclick="login()">Ingresar al Jardín</button>
-  <p id="loginError" style="color:#ff4b4b; font-size:0.85rem; margin-top:10px; display:none;">Credenciales incorrectas</p>
+  <h2>The Secret Gardens</h2>
+  <p>Panel de Administración Privado</p>
+  <input type="text" id="userInput" placeholder="Usuario administrador" autocomplete="username">
+  <input type="password" id="passInput" placeholder="Contraseña de seguridad" autocomplete="current-password">
+  <button onclick="login()">Ingresar al Jardín 🔑</button>
+  <p id="loginError" style="color:#ff5e5e; font-size:0.85rem; margin-top:15px; display:none; font-style: normal; font-weight: 500;">❌ Credenciales de acceso incorrectas</p>
 </div>
 
+<!-- CUERPO DEL PANEL DE GESTIÓN -->
 <div id="adminPanel" class="admin-box">
   <div class="admin-header">
     <h1>Terminal de Gestión</h1>
-    <p style="font-size:0.85rem; color:var(--lavender);">The Secret Gardens Books</p>
+    <p style="font-size:0.85rem; color:var(--lavender); text-transform: uppercase; letter-spacing: 1px;">SGB — Base de Datos Integrada</p>
   </div>
   
+  <!-- CUADRO MÁGICO CON ASISTENTE DE IA -->
   <div class="ia-section">
-    <label style="color:var(--gold); font-weight:600;">✨ Asistente de Autollenado con IA</label>
-    <p style="font-size:0.78rem; color:var(--lavender); margin-bottom:10px;">Pega aquí cualquier bloque de texto desordenado del libro y la IA rellenará el formulario entero.</p>
-    <textarea id="rawIAText" rows="4" placeholder="Ej: Consígueme el libro Alas de Sangre de Rebecca Yarros, cuesta 25$, es de género romance y fantasía, tapa dura..."></textarea>
-    <button id="btnIA" onclick="procesarConIA()" style="background:linear-gradient(45deg, var(--purple), #8c6fc2);">Procesar Texto con IA 🔮</button>
+    <div class="ia-header-title">
+      <span>✨</span> Asistente Inteligente de Autollenado (IA)
+    </div>
+    <p style="font-size:0.78rem; color:var(--lavender); margin-bottom:12px; line-height:1.4;">Pega aquí los datos en bruto de un libro (pueden ser de un chat, resumen, etc.). La Inteligencia Artificial rellenará los campos de la ficha técnica de forma automática.</p>
+    <textarea id="rawIAText" rows="4" placeholder="Ej: Consígueme el libro 'Alas de Sangre' de Rebecca Yarros, tapa dura, precio aproximado 25.40 dólares, es un romance juvenil de dragones..."></textarea>
+    <button id="btnIA" onclick="procesarConIA()">Procesar Datos con IA 🔮</button>
+    
+    <!-- Animación Visual de Carga -->
+    <div id="iaLoading" class="loading-container">
+      <div class="spinner"></div>
+      <div class="loading-text">Gemini AI está analizando y organizando los datos...</div>
+    </div>
   </div>
 
+  <!-- Buscador de Registros por ID -->
   <div class="search-section">
     <div class="input-container">
       <label>Buscar Libro Existente (Por ID)</label>
-      <input type="number" id="searchId" placeholder="Escriba el ID..." style="margin-bottom:0;">
+      <input type="number" id="searchId" placeholder="Escriba el ID numérico..." style="margin-bottom:0;">
     </div>
     <button onclick="buscarLibro()">Buscar 🔍</button>
   </div>
 
+  <!-- Formulario de Campos Técnicos -->
   <form id="bookForm" onsubmit="guardarDatos(event)">
     <div class="row-grid">
       <div class="form-group">
-        <label>ID del Libro (Numérico)</label>
+        <label>ID del Libro (Ficha)</label>
         <input type="number" id="bookId" required placeholder="Ej: 1">
       </div>
       <div class="form-group">
@@ -95,18 +370,18 @@
     <div class="row-grid">
       <div class="form-group">
         <label>Título del Libro</label>
-        <input type="text" id="bookTitle" required placeholder="Nombre del libro">
+        <input type="text" id="bookTitle" required placeholder="Título completo">
       </div>
       <div class="form-group">
-        <label>Autor</label>
+        <label>Autor / Escritor</label>
         <input type="text" id="bookAuthor" required placeholder="Nombre del autor">
       </div>
     </div>
 
     <div class="row-grid">
       <div class="form-group">
-        <label>Género Literario</label>
-        <input type="text" id="bookGenre" required placeholder="Ej: Romance, Fantasía">
+        <label>Categorías / Géneros</label>
+        <input type="text" id="bookGenre" required placeholder="Ej: Romance, Fantasía, Suspenso">
       </div>
       <div class="form-group">
         <label>Tipo de Tapa</label>
@@ -119,20 +394,20 @@
 
     <div class="row-grid">
       <div class="form-group">
-        <label>Link de Imagen (Google Drive)</label>
-        <input type="text" id="bookImg" required placeholder="Enlace de compartir de Drive">
+        <label>URL de Portada (Google Drive)</label>
+        <input type="text" id="bookImg" required placeholder="Pega el enlace de compartir de Drive">
       </div>
       <div class="form-group">
-        <label>¿Disponible en Stock?</label>
+        <label>Disponibilidad de Stock</label>
         <select id="bookStock">
-          <option value="Si">Si</option>
-          <option value="No">No</option>
+          <option value="Si">Si (Disponible)</option>
+          <option value="No">No (Agotado)</option>
         </select>
       </div>
     </div>
 
-    <label>Sinopsis / Descripción</label>
-    <textarea id="bookDesc" rows="6" required placeholder="Escribe aquí la sinopsis completa..."></textarea>
+    <label>Sinopsis de la Obra</label>
+    <textarea id="bookDesc" rows="6" required placeholder="Escribe o pule la descripción del libro aquí..."></textarea>
 
     <button type="submit" id="submitBtn">Guardar Libro en Excel 🌙</button>
   </form>
@@ -141,20 +416,23 @@
 </div>
 
 <script>
+// Base de datos de Google Sheets de consulta lectura (CSV)
 const URL_CSV = "https://docs.google.com/spreadsheets/d/1LyKI6OiOagXXQDel0a5NKojaggCccEEMQF43L2fgTuw/export?format=csv&gid=0";
 
-// TU NUEVA DIRECCIÓN DE SERVIDOR DETECTADA Y ACTUALIZADA AQUÍ
-const URL_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbwHCwwlL0BU9FYKz2EMa4gjFeYzoG-qJLBY5OX0C0JIkR0qDV-xr42KFkf2gLfyuqd_/exec";
+// ENLACE ACTUALIZADO DEL MOTOR APPS SCRIPT DE TU EXCEL NUEVO
+const URL_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbxZCqk9mBHKAMWyNQrcRJLXAS57K_c0ewpSs6V9ssKI6H-pQNL53gQmnJdKronvZLe8/exec";
 
 let sessionUser = "";
 let sessionPass = "";
 
+// ── Gestión de Login Local ──
 function login() {
   const u = document.getElementById('userInput').value.trim();
   const p = document.getElementById('passInput').value.trim();
   
-  if(u === "bibi" && p === "bibi3011") {
-    sessionUser = u; sessionPass = p;
+  if (u.toLowerCase() === "bibi" && p === "bibi3011") {
+    sessionUser = u.toLowerCase();
+    sessionPass = p;
     document.getElementById('loginSection').style.display = 'none';
     document.getElementById('adminPanel').style.display = 'block';
   } else {
@@ -162,14 +440,21 @@ function login() {
   }
 }
 
+// ── Procesamiento de texto desordenado con Inteligencia Artificial ──
 async function procesarConIA() {
   const texto = document.getElementById('rawIAText').value.trim();
-  if (!texto) return alert("Por favor, introduce algún texto para procesar.");
+  if (!texto) {
+    showStatus("Por favor, introduce algún texto para que la IA pueda analizarlo.", "error");
+    return;
+  }
   
   const btn = document.getElementById('btnIA');
-  btn.innerText = "Sincronizando con Gemini AI... ⌛🔮";
+  const loader = document.getElementById('iaLoading');
+  
+  // Activar interfaz de carga visual
   btn.disabled = true;
-  showStatus("La Inteligencia Artificial está analizando tu texto y calculando el ID. Por favor espera...", "success");
+  loader.style.display = "flex";
+  showStatus("Sincronizando con los servidores de Google Gemini... Por favor espera.", "success");
   
   try {
     const response = await fetch(URL_APPS_SCRIPT, {
@@ -186,6 +471,8 @@ async function procesarConIA() {
     
     if (resData.status === "success") {
       const libro = resData.data;
+      
+      // Volcar resultados de la IA de forma precisa en el formulario
       document.getElementById('bookId').value = libro.id || "";
       document.getElementById('bookTitle').value = libro.titulo || "";
       document.getElementById('bookAuthor').value = libro.autor || "";
@@ -195,34 +482,43 @@ async function procesarConIA() {
       document.getElementById('bookCover').value = libro.tapa || "Tapa Blanda";
       document.getElementById('bookStock').value = "Si";
       
-      showStatus("¡Campos completados con éxito! Solo añade el link de imagen y guarda.", "success");
+      showStatus("✨ ¡Ficha rellenada con éxito! Revisa la información, agrega el link de imagen y guarda el libro.", "success");
       document.getElementById('rawIAText').value = "";
     } else {
-      showStatus("Error interno de la IA: " + resData.message, "error");
+      showStatus("Error de la IA: " + resData.message + ". Verifica los permisos y vuelve a intentar.", "error");
     }
   } catch (error) {
-    showStatus("Error de conexión: " + error.message + ". Asegúrate de publicar el Apps Script como 'Nueva versión' y acceso para 'Cualquiera'.", "error");
+    showStatus("Error de conexión: No se pudo contactar al Apps Script. Asegúrate de que el script en Google Sheets esté implementado correctamente y con acceso para 'Cualquiera'.", "error");
+    console.error(error);
   } finally {
-    btn.innerText = "Procesar Texto con IA 🔮";
+    // Apagar animaciones de carga
     btn.disabled = false;
+    loader.style.display = "none";
   }
 }
 
+// ── Búsqueda de registros existentes por ID ──
 async function buscarLibro() {
   const idBuscado = document.getElementById('searchId').value.trim();
-  if(!idBuscado) return alert("Por favor escribe un ID para buscar.");
-  showStatus("Consultando base de datos...", "success");
+  if (!idBuscado) {
+    showStatus("Escribe un número de ID para iniciar la búsqueda.", "error");
+    return;
+  }
+  
+  showStatus("Consultando base de datos en tiempo real... 🔍", "success");
   
   try {
     const response = await fetch(URL_CSV);
     const textData = await response.text();
+    
     Papa.parse(textData, {
       header: false,
       skipEmptyLines: true,
       complete: function(results) {
         const rows = results.data.slice(1);
         const libro = rows.find(r => String(r[0]).trim() === idBuscado);
-        if(libro) {
+        
+        if (libro) {
           document.getElementById('bookId').value = libro[0] || "";
           document.getElementById('bookTitle').value = libro[1] || "";
           document.getElementById('bookAuthor').value = libro[2] || "";
@@ -230,28 +526,35 @@ async function buscarLibro() {
           document.getElementById('bookPrice').value = libro[4] ? libro[4].replace(/[^0-9.-]+/g,"") : "0";
           document.getElementById('bookDesc').value = libro[5] || "";
           document.getElementById('bookImg').value = libro[6] || "";
+          
           let stockVal = libro[7] ? libro[7].trim().toLowerCase() : "si";
           document.getElementById('bookStock').value = (stockVal === "no" || stockVal === "0" || stockVal === "agotado") ? "No" : "Si";
           document.getElementById('bookCover').value = libro[8] || "Tapa Blanda";
-          showStatus("¡Libro cargado! Modifica lo que necesites y guarda.", "success");
+          
+          showStatus("📖 ¡Libro cargado! Modifica los datos deseados y presiona guardar.", "success");
         } else {
-          showStatus("El ID no existe. Guardará como un libro nuevo.", "error");
+          showStatus("El ID " + idBuscado + " no está registrado. Si guardas, se creará un registro nuevo con este ID.", "error");
           document.getElementById('bookId').value = idBuscado;
           document.getElementById('bookStock').value = "Si";
         }
       }
     });
-  } catch (error) { showStatus("Error: " + error.message, "error"); }
+  } catch (error) { 
+    showStatus("Error de lectura: " + error.message, "error"); 
+  }
 }
 
+// ── Guardar / Actualizar datos en Google Sheets ──
 async function guardarDatos(event) {
   event.preventDefault();
   const btn = document.getElementById('submitBtn');
   btn.innerText = "Sincronizando con Excel... ⌛";
   btn.disabled = true;
+  showStatus("Guardando los cambios en tu hoja de cálculo...", "success");
 
   const payload = {
-    user: sessionUser, pass: sessionPass,
+    user: sessionUser, 
+    pass: sessionPass,
     id: document.getElementById('bookId').value.trim(),
     titulo: document.getElementById('bookTitle').value.trim(),
     autor: document.getElementById('bookAuthor').value.trim(),
@@ -264,17 +567,33 @@ async function guardarDatos(event) {
   };
 
   try {
-    await fetch(URL_APPS_SCRIPT, { method: "POST", mode: "no-cors", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
-    showStatus("¡Guardado exitoso en tu Google Sheets!", "success");
+    await fetch(URL_APPS_SCRIPT, { 
+      method: "POST", 
+      mode: "no-cors", 
+      headers: { "Content-Type": "application/json" }, 
+      body: JSON.stringify(payload) 
+    });
+    
+    showStatus("🎉 ¡Sincronización completada! El libro se guardó exitosamente en Google Sheets y los cambios se reflejarán en tu catálogo.", "success");
     document.getElementById('bookForm').reset();
     document.getElementById('searchId').value = "";
-  } catch (error) { showStatus("Error al guardar: " + error.message, "error"); }
-  finally { btn.innerText = "Guardar Libro en Excel 🌙"; btn.disabled = false; }
+  } catch (error) { 
+    showStatus("Error de escritura: " + error.message, "error"); 
+  } finally { 
+    btn.innerText = "Guardar Libro en Excel 🌙"; 
+    btn.disabled = false; 
+  }
 }
 
+// ── Renderizador de Mensajes de Estado ──
 function showStatus(text, type) {
   const el = document.getElementById('statusMsg');
-  el.innerText = text; el.className = "status-msg " + type; el.style.display = "block";
+  el.innerText = text; 
+  el.className = "status-msg " + type; 
+  el.style.display = "block";
+  
+  // Auto-scroll suave hasta el mensaje de respuesta para celulares
+  el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 </script>
 </body>
